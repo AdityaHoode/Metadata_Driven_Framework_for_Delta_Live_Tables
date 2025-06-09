@@ -73,7 +73,7 @@ class CDCApplyChanges:
     """CDC ApplyChanges structure."""
 
     keys: list
-    sequence_by: str
+    sequence_by: list
     where: str
     ignore_null_updates: bool
     apply_as_deletes: str

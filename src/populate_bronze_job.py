@@ -91,7 +91,7 @@ tableProperties = None
 partitionColumns = None #Example: #['customer_id','operation_date'] Databricks Recommends to use Liquid Clustering instead of Partitioning
 liquidClusteringColumns = None #Example: #['customer_id','operation_date'] Databricks Highly Recommends using Liquid Clustering Doc: https://docs.databricks.com/aws/en/delta/clustering#choose-clustering-keys
 # cdcApplyChanges = '{"apply_as_deletes": "operation_type = \'D\'", "track_history_except_column_list": ["operation_type", "operation_timestamp", "position"], "keys": ["id"], "scd_type": "2", "sequence_by": "operation_timestamp"}' # '{"apply_as_deletes": "operation = \'DELETE\'","track_history_except_column_list": ["operation", "sequenceNum"], "except_column_list": ["operation", "sequenceNum"], "keys": ["userId"], "scd_type": "2", "sequence_by": "sequenceNum"}'
-cdcApplyChanges = '{"apply_as_deletes": "operation_type = \'D\'", "track_history_except_column_list": ["operation_type", "operation_timestamp", "position"], "keys": ["id"], "scd_type": "2", "sequence_by": "operation_timestamp"}'
+cdcApplyChanges = '{"apply_as_deletes": "operation_type = \'D\'", "track_history_except_column_list": ["operation_type", "operation_timestamp", "position"], "keys": ["id"], "scd_type": "2", "sequence_by": ["operation_timestamp", "position"]}'
 dataQualityExpectations = None # Example: '{"expect_or_drop": {"no_rescued_data": "_rescued_data IS NULL","valid_customer_id": "customers_id IS NOT NULL"}}'  Documentation: https://docs.databricks.com/en/delta-live-tables/expectations.html
 quarantineTargetDetails = None
 quarantineTableProperties = None

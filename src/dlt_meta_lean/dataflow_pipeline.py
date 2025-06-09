@@ -3,7 +3,7 @@ import json
 import logging
 import dlt
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import expr, col
+from pyspark.sql.functions import expr, col, struct
 from pyspark.sql.types import StructType, StructField
 import inspect
 
@@ -405,6 +405,7 @@ class DataflowPipeline:
         )
 
         sequenced_by_data_type = None
+        sequenced_by_struct = StructType([])
         modified_schema = StructType([])
         if struct_schema:
             for field in struct_schema.fields:
@@ -413,13 +414,21 @@ class DataflowPipeline:
                         modified_schema.add(field)
                 else:
                     modified_schema.add(field)                    
-                if field.name == cdc_apply_changes.sequence_by:
+                if len(cdc_apply_changes.sequence_by) == 1 and field.name == cdc_apply_changes.sequence_by[0]:
                     sequenced_by_data_type = field.dataType
+                else:
+                    if field.name in cdc_apply_changes.sequence_by:
+                        sequenced_by_struct.add(StructField(field.name, field.dataType))
             struct_schema = modified_schema
 
         if struct_schema and cdc_apply_changes.scd_type == "2":
-            struct_schema.add(StructField("__START_AT", sequenced_by_data_type))
-            struct_schema.add(StructField("__END_AT", sequenced_by_data_type))
+            if sequenced_by_data_type:
+                struct_schema.add(StructField("__START_AT", sequenced_by_data_type))
+                struct_schema.add(StructField("__END_AT", sequenced_by_data_type))
+            else:
+                struct_schema.add(StructField("__START_AT", sequenced_by_struct))
+                struct_schema.add(StructField("__END_AT", sequenced_by_struct))           
+
 
         target_path = None if self.uc_enabled else self.dataflowSpec.targetDetails["path"]
 
@@ -445,7 +454,7 @@ class DataflowPipeline:
             target=f"{self.dataflowSpec.targetDetails['table']}",
             source=self.view_name,
             keys=cdc_apply_changes.keys,
-            sequence_by=col(cdc_apply_changes.sequence_by),
+            sequence_by=struct(*cdc_apply_changes.sequence_by) if len(cdc_apply_changes.sequence_by) != 1 else col(cdc_apply_changes.sequence_by[0]),
             where=cdc_apply_changes.where,
             ignore_null_updates=cdc_apply_changes.ignore_null_updates,
             apply_as_deletes=apply_as_deletes,
