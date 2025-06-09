@@ -62,6 +62,7 @@ class PipelineReaders:
             
 
         if schema_json and bronze_dataflow_spec.sourceFormat.lower() != "delta":
+            schema_json['fields'] = [field for field in schema_json['fields'] if field['name'] != 'file_path' and field['name'] != 'processing_time']
             schema = StructType.fromJson(schema_json)
             return (
                 spark.readStream.format(bronze_dataflow_spec.sourceFormat)
