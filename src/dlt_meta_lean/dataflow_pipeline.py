@@ -54,7 +54,8 @@ class DataflowPipeline:
             if dataflow_spec.schema is not None:
                 self.schema_json = json.loads(dataflow_spec.schema)
             else:
-                self.schema_json = None
+                # self.schema_json = None
+                self.schema_json = DataflowSpecUtils.get_schema_json(self.spark, self.dataflowSpec)
         else:
             self.schema_json = None
         if isinstance(dataflow_spec, SilverDataflowSpec) and not self.dataflowSpec.materializedView:

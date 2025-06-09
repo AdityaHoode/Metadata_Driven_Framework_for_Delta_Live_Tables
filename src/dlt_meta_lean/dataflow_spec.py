@@ -277,8 +277,16 @@ class DataflowSpecUtils:
             )
             schema_json = schema.jsonValue()
         elif reader_config_options["cloudFiles.format"].lower() == "csv":
-            json_schema_string_value = dataflow_spec.schema
-            schema_json = json.loads(json_schema_string_value)
+            # json_schema_string_value = dataflow_spec.schema
+            # schema_json = json.loads(json_schema_string_value)
+            schema = (
+                spark.read.format("csv")
+                .options(**{k: v for k, v in reader_config_options.items() if "cloudFiles" not in k})
+                .load(source_path).limit(100)
+                .withColumn(reader_config_options["cloudFiles.rescuedDataColumn"], lit(None).cast("STRING"))
+                .limit(100)
+            ).schema 
+            schema_json = schema.jsonValue()
         else:
             raise Exception(
                 f"""Dataflow schema not supported for type = {type(dataflow_spec.dataFlowId)}!
