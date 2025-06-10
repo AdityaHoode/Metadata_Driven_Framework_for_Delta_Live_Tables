@@ -87,11 +87,11 @@ cloudFileNotificationsConfig = None ## If using Auto Loader file notification mo
 schema = None # '{"fields":[{"metadata":{},"name":"userId","nullable":true,"type":"integer"},{"metadata":{},"name":"name","nullable":true,"type":"string"},{"metadata":{},"name":"city","nullable":true,"type":"string"},{"metadata":{},"name":"operation","nullable":true,"type":"string"},{"metadata":{},"name":"sequenceNum","nullable":true,"type":"integer"},{"metadata":{},"name":"_rescued_data","nullable":true,"type":"string"}],"type":"struct"}' # If inpute schema is defined, rather than the infer schema option
 targetFormat = 'delta' ## Target format, almost always "delta"
 targetDetails = {"database":f"{target_catalog}{env}.{target_schema}","table":"cmf_nominations_scd2"}
-tableProperties = None
+tableProperties = {"delta.enableChangeDataFeed": "true"}
 partitionColumns = None #Example: #['customer_id','operation_date'] Databricks Recommends to use Liquid Clustering instead of Partitioning
 liquidClusteringColumns = None #Example: #['customer_id','operation_date'] Databricks Highly Recommends using Liquid Clustering Doc: https://docs.databricks.com/aws/en/delta/clustering#choose-clustering-keys
 # cdcApplyChanges = '{"apply_as_deletes": "operation_type = \'D\'", "track_history_except_column_list": ["operation_type", "operation_timestamp", "position"], "keys": ["id"], "scd_type": "2", "sequence_by": "operation_timestamp"}' # '{"apply_as_deletes": "operation = \'DELETE\'","track_history_except_column_list": ["operation", "sequenceNum"], "except_column_list": ["operation", "sequenceNum"], "keys": ["userId"], "scd_type": "2", "sequence_by": "sequenceNum"}'
-cdcApplyChanges = '{"apply_as_deletes": "operation_type = \'D\'", "track_history_except_column_list": ["operation_type", "operation_timestamp", "position"], "keys": ["id"], "scd_type": "2", "sequence_by": ["operation_timestamp", "position"]}'
+cdcApplyChanges = '{"apply_as_deletes": "operation_type = \'D\'", "track_history_except_column_list": ["operation_type", "operation_timestamp", "position", "_rescued_data", "file_path", "processing_time"], "keys": ["id"], "scd_type": "2", "sequence_by": ["operation_timestamp", "position"]}'
 dataQualityExpectations = None # Example: '{"expect_or_drop": {"no_rescued_data": "_rescued_data IS NULL","valid_customer_id": "customers_id IS NOT NULL"}}'  Documentation: https://docs.databricks.com/en/delta-live-tables/expectations.html
 quarantineTargetDetails = None
 quarantineTableProperties = None
@@ -141,7 +141,7 @@ cloudFileNotificationsConfig = None ## If using CloudFilesNotification Mode
 schema = None # '{"fields":[{"metadata":{},"name":"userId","nullable":true,"type":"integer"},{"metadata":{},"name":"name","nullable":true,"type":"string"},{"metadata":{},"name":"city","nullable":true,"type":"string"},{"metadata":{},"name":"operation","nullable":true,"type":"string"},{"metadata":{},"name":"sequenceNum","nullable":true,"type":"integer"},{"metadata":{},"name":"_rescued_data","nullable":true,"type":"string"}],"type":"struct"}' # If inpute schema is defined, rather than the infer schema option
 targetFormat = 'delta' ## Target format, almost always "delta"
 targetDetails = {"database":f"{target_catalog}{env}.{target_schema}","table":"cmf_nominations_scd1"}
-tableProperties = None
+tableProperties = {"delta.enableChangeDataFeed": "true"}
 partitionColumns = None #Example: #['customer_id','operation_date'] Databricks Recommends to use Liquid Clustering instead of Partitioning
 liquidClusteringColumns = None #Example: #['customer_id','operation_date'] Databricks Highly Recommends using Liquid Clustering Doc: https://docs.databricks.com/aws/en/delta/clustering#choose-clustering-keys
 cdcApplyChanges = None # '{"apply_as_deletes": "operation = \'D\'", "track_history_except_column_list": ["operation_type", "operation_timestamp", "position"], "keys": ["id"], "scd_type": "2", "sequence_by": "operation_timestamp"}' # '{"apply_as_deletes": "operation = \'DELETE\'","track_history_except_column_list": ["operation", "sequenceNum"], "except_column_list": ["operation", "sequenceNum"], "keys": ["userId"], "scd_type": "2", "sequence_by": "sequenceNum"}'
