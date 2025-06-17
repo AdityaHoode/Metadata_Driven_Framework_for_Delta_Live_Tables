@@ -38,6 +38,7 @@ dbutils.widgets.text('integration_logs_table',defaultValue='data_integration_log
 dbutils.widgets.text('dataFlowGroup',defaultValue='')  # Filter for specific dataflow group
 
 # COMMAND ----------
+
 dbutils.widgets.dropdown('streaming',choices=['true','false'],defaultValue='false')  # Filter for specific dataflow group
 
 # COMMAND ----------
@@ -70,6 +71,7 @@ dataFlowGroup = dbutils.widgets.get("dataFlowGroup")
 integration_logs_table = dbutils.widgets.get("integration_logs_table")
 
 # COMMAND ----------
+
 stream_from_tables = dbutils.widgets.get("streaming")
 
 # COMMAND ----------
@@ -119,12 +121,14 @@ def upsertToDelta(microBatchOutputDF,batchId):
         contract_version,
         contract_major_version,
         watermark_next_value,
+        target_table,
         source_file,
         `__insert_ts`) 
         VALUES (s.contract_id,
         s.contract_version,
         s.contract_major_version,
         s.watermark_next_value,
+        s.target_table,
         s.source_file,
         current_timestamp())
         """
@@ -221,5 +225,5 @@ for row in targets.collect():
             .start()
         )
 
-if stream_from_tables == 'false':
-    upsertToDelta(results,None)
+    if stream_from_tables == 'false':
+        upsertToDelta(results,None)
