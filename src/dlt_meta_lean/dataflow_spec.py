@@ -266,7 +266,15 @@ class DataflowSpecUtils:
         reader_config_options = dataflow_spec.readerConfigOptions
         schema_json = None
         if reader_config_options["cloudFiles.format"].lower() == "parquet":
-            schema = spark.read.options(**reader_config_options).parquet(source_path).limit(100).schema
+            schema = (
+                spark.read
+                .options(**reader_config_options)
+                .parquet(source_path)
+                .withColumn(reader_config_options["cloudFiles.rescuedDataColumn"], lit(None).cast("STRING"))
+                .withColumn("file_path", lit(None).cast("STRING"))
+                .withColumn("processing_time", lit(None).cast("TIMESTAMP"))
+                .limit(100)
+            ).schema
             schema_json = schema.jsonValue()
         elif reader_config_options["cloudFiles.format"].lower() == "json":
             schema = (
